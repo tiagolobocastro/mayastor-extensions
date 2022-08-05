@@ -124,7 +124,7 @@ rest:
       # cpu limits for rest
       cpu: "100m"
       # memory limits for rest
-      memory: "128Mi"
+      memory: "512Mi"
     requests:
       # cpu requests for rest
       cpu: "50m"
