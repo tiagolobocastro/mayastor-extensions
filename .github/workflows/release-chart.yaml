@@ -1,16 +1,31 @@
-name: Release Helm Chart
 on:
-  push:
-    branches:
-      - develop
+  pull_request_target:
+    types:
+      - closed
 
 jobs:
-  release-chart:
+  if_merged:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Publish Mayastor Helm chart
-        uses: stefanprodan/helm-gh-pages@v1.5.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: .
+    - uses: actions/checkout@v3
+      with:
+       fetch-depth: 0
+    - name: Chart Changed
+      id: chart_changed
+      env:
+        GITHUB_BRANCH: ${{ github.head_ref || github.ref_name }}
+      run: |
+        if ! git diff --exit-code ${{ github.event.pull_request.head.sha }} ${{ github.event.pull_request.base.sha }} ./chart; then
+          echo "TRUE"
+          echo "::set-output name=FLAG::true"
+        else
+          echo "FALSE"
+          echo "::set-output name=FLAG::false"
+        fi
+    - name: Publish Mayastor Helm chart
+      uses: stefanprodan/helm-gh-pages@v1.5.0
+      if: ${{ steps.chart_changed.outputs.FLAG == 'true' }}
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        charts_dir: .
