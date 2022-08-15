@@ -10,12 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+         fetch-depth: 0
       - name: Chart Changed
         id: chart_changed
         env:
           GITHUB_BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
           PAGER= git log -3
+          env
           if ! git diff --exit-code "origin/${GITHUB_BRANCH##*/}" ./chart; then
             echo "TRUE"
             echo "::set-output name=FLAG::true"
