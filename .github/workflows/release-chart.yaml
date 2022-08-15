@@ -3,14 +3,30 @@ on:
   push:
     branches:
       - develop
+      - test
 
 jobs:
   release-chart:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - name: Chart Changed
+        id: chart_changed
+        env:
+          GITHUB_BRANCH: ${{ github.ref }}
+        run: |
+          PAGER= git log -2
+          echo ${{ github.head_ref || github.ref_name }} 
+          echo "${GITHUB_BRANCH##*/}"
+          if ! git diff --exit-code "${GITHUB_BRANCH##*/}" ./chart 1>/dev/null; then
+            echo "::set-output name=FLAG::true"
+          else
+            echo "::set-output name=FLAG::false"
+          fi
       - name: Publish Mayastor Helm chart
         uses: stefanprodan/helm-gh-pages@v1.5.0
+        if: ${{ steps.chart_changed.outputs.FLAG == 'true' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          branch: test-pages
           charts_dir: .
