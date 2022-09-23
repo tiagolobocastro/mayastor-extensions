@@ -32,6 +32,9 @@ mkShell {
     pytest_inputs
     python3
     utillinux
+    which
+    semver-tool
+    yq-go
   ] ++ pkgs.lib.optional (!norust) channel.default_src.nightly;
 
   PROTOC = "${protobuf}/bin/protoc";
