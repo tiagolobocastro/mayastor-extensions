@@ -2,8 +2,9 @@ name: Release Artifacts
 on:
   push:
     branches:
-      - 'release/**'
-      - 'develop'
+      - test
+      #- 'release/**'
+      #- 'develop'
 
 jobs:
   kubectl-plugin:
