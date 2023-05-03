@@ -15,13 +15,6 @@ jobs:
           - os: ubuntu-latest
             target: linux-musl
             arch: x86_64
-          - os: macos-latest
-            target: apple-darwin
-            arch: x86_64
-          - os: ubuntu-latest
-            target: windows-gnu
-            arch: x86_64
-            suffix: .exe
     steps:
       - uses: actions/checkout@v3
         with:
@@ -35,7 +28,8 @@ jobs:
           name: mayastor-extensions
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: |
-          nix-build -A utils.release.${{ matrix.target }}.kubectl-plugin --arg incremental false ${{ matrix.system }}
+        PAGER= git tag
+        #nix-build -A utils.release.${{ matrix.target }}.kubectl-plugin --arg incremental false ${{ matrix.system }}
       - uses: actions/upload-artifact@v3
         with:
           name: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}
