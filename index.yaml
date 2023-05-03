@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   mayastor:
   - apiVersion: v2
+    appVersion: 2.1.3
+    created: "2023-05-03T20:44:57.453091151Z"
+    dependencies:
+    - name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.6.0
+    - condition: base.jaeger.enabled
+      name: jaeger-operator
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 2.25.0
+    - condition: loki-stack.enabled
+      name: loki-stack
+      repository: https://grafana.github.io/helm-charts
+      version: 2.6.4
+    description: Mayastor Helm chart for Kubernetes
+    digest: 4fd53d9d9fd7acd07a54c1f6da743e7009c85ca354a5c30d616b0e2bb965d1e0
+    name: mayastor
+    type: application
+    urls:
+    - https://tiagolobocastro.github.io/mayastor-extensions/mayastor-2.1.3.tgz
+    version: 2.1.3
+  - apiVersion: v2
     appVersion: 2.1.2
     created: "2023-05-03T20:36:56.985099703Z"
     dependencies:
@@ -115,4 +137,4 @@ entries:
     urls:
     - https://tiagolobocastro.github.io/mayastor-extensions/mayastor-0.0.0.tgz
     version: 0.0.0
-generated: "2023-05-03T20:36:56.964202982Z"
+generated: "2023-05-03T20:44:57.425994645Z"
