@@ -40,9 +40,5 @@ jobs:
       - run: |
           PAGER= git describe --abbrev=12 --always
           PAGER= git describe --abbrev=12 --always --long
-          nix-build -A utils.release.${{ matrix.target }}.kubectl-plugin --arg incremental false ${{ matrix.system }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}
-          path: ./result/bin/kubectl-mayastor${{ matrix.suffix }}
-          if-no-files-found: error
+          PAGER= git tag
+          PAGER= git tag --points-at HEAD
