@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+          fetch-depth: 0
       - uses: cachix/install-nix-action@v20
         with:
           nix_path: nixpkgs=channel:nixos
@@ -36,6 +37,12 @@ jobs:
         with:
           name: mayastor-extensions
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - run: |
+          # BUG: HEAD tag is fetched as lightweight instead of annotated
+          # https://github.com/actions/checkout/issues/290
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          fi
       - run: |
           nix-build -A utils.release.${{ matrix.target }}.kubectl-plugin --arg incremental false ${{ matrix.system }}
       - uses: actions/upload-artifact@v3
