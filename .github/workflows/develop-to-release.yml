@@ -24,6 +24,7 @@ jobs:
           branch="${{ github.ref_name }}"
           ./scripts/git/set-submodule-branches.sh --branch "$branch"
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "chore(ci): update helm chart versions and/or git submodules"
@@ -35,3 +36,9 @@ jobs:
           draft: false
           title: Prepare repo for release branch
           signoff: true
+      - name: Enable Pull Request Automerge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+          merge-method: squash
