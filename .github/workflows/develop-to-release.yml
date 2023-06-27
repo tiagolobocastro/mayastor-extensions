@@ -24,6 +24,7 @@ jobs:
           branch="${{ github.ref_name }}"
           ./scripts/git/set-submodule-branches.sh --branch "$branch"
       - name: Create Pull Request
+        id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
           commit-message: "chore(ci): update helm chart versions and/or git submodules"
@@ -35,3 +36,6 @@ jobs:
           draft: false
           title: Prepare repo for release branch
           signoff: true
+      - name: Bors Merge Pull Request
+        run: |
+          gh pr comment ${{ steps.cpr.outputs.pull-request-number }} --body "bors merge"
