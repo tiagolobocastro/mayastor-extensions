@@ -1,0 +1,55 @@
+name: CI
+on:
+  push: 
+    branches: 
+      - minikube
+jobs:
+  job1:
+    runs-on: windows-2022
+    name: build example and deploy to minikube
+    steps:
+    # - name: Choco help
+    #   uses: crazy-max/ghaction-chocolatey@v3
+    #   with:
+    #     args: install virtualbox
+    # - shell: pwsh
+    #   run: |
+    #     Get-WindowsFeature
+    #     Install-WindowsFeature -Name Hyper-V-PowerShell
+    # - name: Start minikube
+    #   uses: medyagh/setup-minikube@master
+    #   with:
+    #     start-args: '--driver=virtualbox'
+    # - name: Try the cluster !
+    #   run: kubectl get pods -A
+   
+    - run: |
+        git config --global core.autocrlf false
+        git config --global core.eol lf
+    - uses: actions/checkout@v4
+    - uses: Vampire/setup-wsl@v2
+      with:
+        additional-packages:
+          curl
+          ca-certificates
+          xz-utils
+          nix
+        #update: 'true'
+        distribution: Ubuntu-22.04
+        wsl-shell-command: bash -c "cd && bash --noprofile --norc '{0}'"
+        wsl-conf: |
+          [automount]
+          root = /
+          [boot]
+          systemd=true
+    # - shell: wsl-bash {0}
+    #   run: |
+    #     sh <(curl -L https://nixos.org/nix/install) --no-daemon
+    - shell: wsl-bash {0}
+      run: |
+        nix-shell -p du --run 'du .'
+        nix-shell --run './tests/bdd/minikube/setup.sh' 'tests/bdd/shell.nix'
+    - name: Try the cluster !
+      shell: wsl-bash {0}
+      #run: nix-shell --run 'kubectl get pods -A' tests/bdd/shell.nix
+      run: kubectl get pods -A
