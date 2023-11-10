@@ -1,0 +1,18 @@
+name: Publish Release Artifacts
+on:
+  release:
+
+jobs:
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish locally in the workspace
+        run: |
+          ls
+          id=$(gh run list -w "Release Artifacts" -R tiagolobocastro/mayastor-extensions --json conclusion,headBranch,databaseId --jq ".[] | select( .conclusion == \"success\" and .headBranch == \"publish\")" | jq ".databaseId")
+          mkdir artifacts
+          gh run download $id -D artifacts
+          tree artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
