@@ -1,0 +1,32 @@
+name: Publish Release Artifacts
+on:
+  release:
+    types: [published]
+jobs:
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish locally in the workspace
+        run: |
+          echo "Release Tag: ${{ github.event.release.tag_name }}"
+          while [ -z "$id" ]; do
+            let "attempt+=1"
+            id=$(gh run list -w "Release Artifacts" --json conclusion,headBranch,databaseId --jq ".[] | select( .conclusion == \"success\" and .headBranch == \"${{ github.event.release.tag_name }}\")" | jq ".databaseId")
+            if [ -n "$id" ]; then
+              mkdir artifacts
+              gh run download $id -D artifacts
+              tree artifacts
+              tars=$(find artifacts/ -type f | xargs)
+              gh release upload "${{ github.event.release.tag_name }}" --clobber $tars 
+            else
+              echo "Release Artifacts not ready after $attempt attempts"
+              if [ "$attempt" -eq 30 ]; then
+                echo "Giving up..."
+                exit 124
+              fi
+              sleep "$((60*2))"
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
