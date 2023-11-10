@@ -2,7 +2,7 @@ name: Release Artifacts
 on:
   push:
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+**'
+      - 'vs[0-9]+.[0-9]+.[0-9]+**'
     branches:
       - 'release/**'
       - 'develop'
@@ -17,16 +17,16 @@ jobs:
           - os: ubuntu-latest
             target: linux-musl
             arch: x86_64
-          - os: ubuntu-latest
-            target: linux-musl
-            arch: aarch64
+          # - os: ubuntu-latest
+          #   target: linux-musl
+          #   arch: aarch64
           - os: macos-latest
             target: apple-darwin
             arch: x86_64
-          - os: ubuntu-latest
-            target: windows-gnu
-            arch: x86_64
-            suffix: .exe
+          # - os: ubuntu-latest
+          #   target: windows-gnu
+          #   arch: x86_64
+          #   suffix: .exe
     steps:
       - uses: actions/checkout@v3
         with:
