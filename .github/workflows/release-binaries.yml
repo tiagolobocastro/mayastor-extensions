@@ -6,6 +6,7 @@ on:
     branches:
       - 'release/**'
       - 'develop'
+      - 'test-aarch64-linux'
 
 jobs:
   kubectl-plugin:
@@ -14,19 +15,23 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            target: linux-musl
-            arch: x86_64
-          - os: ubuntu-latest
-            target: linux-musl
-            arch: aarch64
+          # - os: ubuntu-latest
+          #   target: linux-musl
+          #   arch: x86_64
+          # - os: ubuntu-latest
+          #   target: linux-musl
+          #   arch: aarch64
           - os: macos-latest
             target: apple-darwin
-            arch: x86_64
-          - os: ubuntu-latest
-            target: windows-gnu
-            arch: x86_64
-            suffix: .exe
+            arch: aarch64
+            system: aarch64-darwin
+          # - os: macos-latest
+          #   target: apple-darwin
+          #   arch: x86_64
+          # - os: ubuntu-latest
+          #   target: windows-gnu
+          #   arch: x86_64
+          #   suffix: .exe
     steps:
       - uses: actions/checkout@v3
         with:
@@ -46,12 +51,12 @@ jobs:
           name: mayastor-extensions
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: |
-          nix-build -A utils.release.${{ matrix.arch }}.${{ matrix.target }}.kubectl-plugin --arg incremental false ${{ matrix.system }}
-      - name: Archive executable
-        run: |
-          tar -czvf kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-mayastor${{ matrix.suffix }}
-      - uses: actions/upload-artifact@v3
-        with:
-          name: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}
-          path: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
-          if-no-files-found: error
+          nix-build -A utils.release.aarch64.${{ matrix.target }}.kubectl-plugin --arg incremental false --argstr system aarch64-darwin
+      # - name: Archive executable
+      #   run: |
+      #     tar -czvf kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}.tar.gz LICENSE -C result/bin kubectl-mayastor${{ matrix.suffix }}
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}
+      #     path: kubectl-mayastor-${{ matrix.arch }}-${{ matrix.target }}.tar.gz
+      #     if-no-files-found: error
