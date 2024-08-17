@@ -604,6 +604,7 @@ dependencies = [
  "snafu",
  "tempfile",
  "tokio",
+ "tokio-retry",
  "tracing",
  "tracing-subscriber",
  "url",
