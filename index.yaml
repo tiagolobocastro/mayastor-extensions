@@ -36,6 +36,40 @@ entries:
     - https://tiagolobocastro.github.io/mayastor-extensions/mayastor-2.7.1.tgz
     version: 2.7.1
   - apiVersion: v2
+    appVersion: 2.7.0
+    created: "2024-09-20T16:10:26.952462413Z"
+    dependencies:
+    - condition: crds.enabled
+      name: crds
+      repository: ""
+      version: 2.7.0
+    - name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.6.0
+    - condition: base.jaeger.enabled
+      name: jaeger-operator
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 2.50.1
+    - condition: loki-stack.enabled
+      name: loki-stack
+      repository: https://grafana.github.io/helm-charts
+      version: 2.9.11
+    - condition: eventing.enabled
+      name: nats
+      repository: https://nats-io.github.io/k8s/helm/charts/
+      version: 0.19.14
+    - condition: localpv-provisioner.enabled
+      name: localpv-provisioner
+      repository: https://openebs.github.io/dynamic-localpv-provisioner
+      version: 4.1.1
+    description: Mayastor Helm chart for Kubernetes
+    digest: ca11ab1328a676f2a2ceb33870a95f5f72fb966961ab010103d5ddabd354f4bb
+    name: mayastor
+    type: application
+    urls:
+    - https://tiagolobocastro.github.io/mayastor-extensions/mayastor-2.7.0.tgz
+    version: 2.7.0
+  - apiVersion: v2
     appVersion: 2.2.0
     created: "2023-06-15T00:07:57.646184193Z"
     dependencies:
@@ -481,4 +515,4 @@ entries:
     urls:
     - https://tiagolobocastro.github.io/mayastor-extensions/mayastor-0.0.0.tgz
     version: 0.0.0
-generated: "2024-09-20T16:08:16.852915529Z"
+generated: "2024-09-20T16:10:26.9316418Z"
