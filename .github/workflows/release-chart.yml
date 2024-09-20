@@ -42,6 +42,8 @@ jobs:
       - release-chart
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: cachix/install-nix-action@v22
       - name: Pre-populate nix-shell
         run: |
