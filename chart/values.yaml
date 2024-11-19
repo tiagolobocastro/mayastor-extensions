@@ -157,6 +157,11 @@ jaeger-operator:
 
 agents:
   core:
+    # -- Request timeout for core agents
+    # Default value is defined in .base.default_req_timeout
+    requestTimeout:
+    # -- Enable minimal timeouts
+    minTimeouts: true
     # -- Log level for the core service
     logLevel: info
     capacity:
