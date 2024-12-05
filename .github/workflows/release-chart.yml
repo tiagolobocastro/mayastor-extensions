@@ -24,6 +24,9 @@ jobs:
       - name: Publish locally in the workspace
         run: |
           tag="${{ github.ref_name }}"
+          echo "${{ github.event.base_ref }}"
+          BASE_REF="${{ github.event.base_ref }}"
+          echo ${BASE_REF#refs/heads/}
           nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --released "$tag"" ./scripts/helm/shell.nix
           nix-shell --pure --run "SKIP_GIT=1 ./scripts/helm/generate-readme.sh" ./scripts/helm/shell.nix
       - name: Create Pull Request
