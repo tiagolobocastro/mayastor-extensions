@@ -19,6 +19,7 @@ jobs:
         run: |
           export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
           echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+          git branch --show-current
           nix-shell --pure --run "echo" ./scripts/helm/shell.nix
       - name: Publish locally in the workspace
         run: |
