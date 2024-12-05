@@ -42,4 +42,4 @@ jobs:
             automated-pr
           draft: false
           signoff: true
-          base: $BRANCH
+          base: ${{ BRANCH }}
