@@ -17,5 +17,5 @@ jobs:
       - name: Dump vars context
         env:
           VARS_JSON: ${{ toJSON(github) }}
-        run: echo "${VARS_JSON}"
+        run: echo "${VARS_JSON} "
       
