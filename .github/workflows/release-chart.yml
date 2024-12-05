@@ -25,7 +25,7 @@ jobs:
         run: |
           tag="${{ github.ref_name }}"
           BASE_REF="${{ github.event.base_ref }}"
-          BRANCH=${BASE_REF#refs/heads/}"
+          BRANCH="${BASE_REF#refs/heads/}"
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --released "$tag" --released-branch "$BRANCH"" ./scripts/helm/shell.nix
           nix-shell --pure --run "SKIP_GIT=1 ./scripts/helm/generate-readme.sh" ./scripts/helm/shell.nix
