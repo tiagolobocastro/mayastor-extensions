@@ -409,7 +409,12 @@ else
     if [ -n "$APP_TAG" ]; then
       die "Cannot specify --update-release and --app-tag together"
     fi
-    APP_TAG=$(semver bump "patch" "$UPDATE_REL")
+    if [ "$(semver get prerel "$UPDATE_REL")" = "" ]; then
+      APP_TAG=$(semver bump "patch" "$UPDATE_REL")
+    else
+      APP_TAG="$CHART_APP_VERSION"
+      APP_TAG=$(semver bump "patch" "$CHART_APP_VERSION")
+    fi
   fi
   if [ -z "$APP_TAG" ]; then
     die "--app-tag not specified"
