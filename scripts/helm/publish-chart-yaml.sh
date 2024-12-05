@@ -256,6 +256,7 @@ Options:
   --check-chart           <branch>                 Check if the chart version/app version is correct for the branch.
   --develop-to-release                             Also upgrade the chart to the release version matching the branch.
   --released              <released-tag>           Bumps the future chart version after releasing the given tag.
+  --released-branch       <branch_name>            The name of the current releasing branch.
   --helm-testing          <branch>                 Upgrade the chart to the appropriate branch chart version.
   --app-tag               <tag>                    The appVersion tag.
   --override-index        <latest_version>         Override the latest chart version from the published chart's index.
@@ -302,6 +303,7 @@ DATE_TIME=
 IGNORE_INDEX_CHECK=
 LATEST_RELEASE_BRANCH=
 BUMP_MAJOR_FOR_MAIN=
+BRANCH=
 
 # Check if all needed tools are installed
 semver --version >/dev/null
@@ -330,6 +332,11 @@ while [ "$#" -gt 0 ]; do
     --released)
       shift
       UPDATE_REL=$1
+      shift
+      ;;
+    --released-branch)
+      shift
+      BRANCH=$1
       shift
       ;;
     --helm-testing)
@@ -410,10 +417,15 @@ else
       die "Cannot specify --update-release and --app-tag together"
     fi
     if [ "$(semver get prerel "$UPDATE_REL")" = "" ]; then
+      if [[ "$BRANCH" =~ ^release/[0-9]+.[0-9]+$ ]]; then
+        bump="patch"
+      else
+        die "Updates on $BRANCH not supported"
+      fi
+
       APP_TAG=$(semver bump "patch" "$UPDATE_REL")
     else
       APP_TAG="$CHART_APP_VERSION"
-      APP_TAG=$(semver bump "patch" "$CHART_APP_VERSION")
     fi
   fi
   if [ -z "$APP_TAG" ]; then
