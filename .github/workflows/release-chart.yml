@@ -42,5 +42,5 @@ jobs:
           draft: false
           signoff: true
           delete-branch: true
-          
+          branch-suffix: "random"
           base: ${{ github.event.base_ref }}
