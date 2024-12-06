@@ -331,7 +331,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --released)
       shift
-      UPDATE_REL=$1
+      UPDATE_REL=${1#v}
       shift
       ;;
     --released-branch)
@@ -416,16 +416,34 @@ else
     if [ -n "$APP_TAG" ]; then
       die "Cannot specify --update-release and --app-tag together"
     fi
-    if [ "$(semver get prerel "$UPDATE_REL")" = "" ]; then
-      if [[ "$BRANCH" =~ ^release/[0-9]+.[0-9]+$ ]]; then
-        bump="patch"
-      else
+    if [ "$(semver get build "$UPDATE_REL")" != "" ]; then
+      die "Build not supported"
+    fi
+    if [ -n "$BRANCH" ]; then
+      if ! [[ "$BRANCH" =~ ^release/[0-9]+.[0-9]+$ ]]; then
         die "Updates on $BRANCH not supported"
       fi
-
-      APP_TAG=$(semver bump "patch" "$UPDATE_REL")
-    else
+      BRANCH_VERSION="${BRANCH#release/}.0"
+      allowed_diff=( "" "patch" )
+      diff="$(semver diff "$BRANCH_VERSION" "$CHART_APP_VERSION")"
+      if ! [[ "${allowed_diff[*]}" =~ $diff ]]; then
+        die "Branch $BRANCH is incompatible due to semver diff of $diff with current $CHART_APP_VERSION"
+      fi
+    fi
+    diff="$(semver diff "$UPDATE_REL" "$CHART_APP_VERSION")"
+    if [ "$diff" = "prerelease" ]; then
+      # It's a pre-release, nothing to do here
       APP_TAG="$CHART_APP_VERSION"
+    else
+      APP_TAG=$(semver bump "patch" "$UPDATE_REL")
+
+      if [ "$(semver compare "$CHART_APP_VERSION" "$UPDATE_REL" )" == "1" ]; then
+        die "Future version can't possibly be older than the current next"
+      fi
+
+      if [ "$(semver get prerel "$UPDATE_REL")" != "" ]; then
+        die "$UPDATE_REL with $diff and preprelease change not allowed"
+      fi
     fi
   fi
   if [ -z "$APP_TAG" ]; then
