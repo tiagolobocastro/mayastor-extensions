@@ -41,4 +41,6 @@ jobs:
             automated-pr
           draft: false
           signoff: true
+          delete-branch: true
+          
           base: ${{ github.event.base_ref }}
