@@ -1,4 +1,8 @@
-use crate::{
+use crate::opts::CliArgs;
+use constants::DS_CONTROLLER_REVISION_HASH_LABEL_KEY;
+use semver::Version;
+use tracing::error;
+use upgrade::{
     common::{
         constants::{
             product_train, CORE_CHART_NAME, IO_ENGINE_LABEL, PARTIAL_REBUILD_DISABLE_EXTENTS,
@@ -8,22 +12,8 @@ use crate::{
     },
     events::event_recorder::{EventAction, EventRecorder},
     helm::upgrade::{HelmUpgradeRunner, HelmUpgraderBuilder},
-    opts::CliArgs,
+    upgrade_data_plane::upgrade_data_plane,
 };
-use constants::DS_CONTROLLER_REVISION_HASH_LABEL_KEY;
-use data_plane::upgrade_data_plane;
-
-use semver::Version;
-use tracing::error;
-
-/// Contains the data-plane upgrade logic.
-pub(crate) mod data_plane;
-
-/// Contains upgrade utilities.
-pub(crate) mod utils;
-
-/// Tools to validate upgrade path.
-pub(crate) mod path;
 
 /// This function starts and sees upgrade through to the end.
 pub(crate) async fn upgrade(opts: &CliArgs) -> Result<()> {
@@ -190,7 +180,7 @@ fn partial_rebuild_check(source_version: &Version, partial_rebuild_is_enabled: b
 mod tests {
     #[test]
     fn test_partial_rebuild_check() {
-        use crate::upgrade::partial_rebuild_check;
+        use crate::product_upgrade::partial_rebuild_check;
         use semver::Version;
 
         let source = Version::new(2, 1, 0);
