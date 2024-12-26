@@ -3,44 +3,44 @@ on:
   push:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+**'
-    branches:
-      - 'release/**'
+    # branches:
+    #   - 'release/**'
 
 jobs:
-  release-chart:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v22
-      - name: Pre-populate nix-shell
-        run: |
-          export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
-          echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
-          nix-shell --pure --run "echo" ./scripts/helm/shell.nix
-      - name: Publish locally in the workspace
-        run: |
-          if [ "${{ github.ref_type }}" == "tag" ]; then
-            tag="${{ github.ref_name }}"
-            # Publish the Chart.yaml locally
-            # Note this does not commit the Chart.yaml changes this the branch
-            nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --app-tag "$tag"" ./scripts/helm/shell.nix
-          else
-            branch="${{ github.ref_name }}"
-            nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --check-chart "$branch"" ./scripts/helm/shell.nix
-          fi
-          nix-shell --pure --run "SKIP_GIT=1 ./scripts/helm/generate-readme.sh" ./scripts/helm/shell.nix
-      - name: Publish Mayastor Helm chart
-        uses: stefanprodan/helm-gh-pages@v1.7.0
-        if: ${{ github.ref_type == 'tag' }}
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          charts_dir: .
+  # release-chart:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: cachix/install-nix-action@v22
+  #     - name: Pre-populate nix-shell
+  #       run: |
+  #         export NIX_PATH=nixpkgs=$(jq '.nixpkgs.url' nix/sources.json -r)
+  #         echo "NIX_PATH=$NIX_PATH" >> $GITHUB_ENV
+  #         nix-shell --pure --run "echo" ./scripts/helm/shell.nix
+  #     - name: Publish locally in the workspace
+  #       run: |
+  #         if [ "${{ github.ref_type }}" == "tag" ]; then
+  #           tag="${{ github.ref_name }}"
+  #           # Publish the Chart.yaml locally
+  #           # Note this does not commit the Chart.yaml changes this the branch
+  #           nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --app-tag "$tag"" ./scripts/helm/shell.nix
+  #         else
+  #           branch="${{ github.ref_name }}"
+  #           nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --check-chart "$branch"" ./scripts/helm/shell.nix
+  #         fi
+  #         nix-shell --pure --run "SKIP_GIT=1 ./scripts/helm/generate-readme.sh" ./scripts/helm/shell.nix
+  #     - name: Publish Mayastor Helm chart
+  #       uses: stefanprodan/helm-gh-pages@v1.7.0
+  #       if: ${{ github.ref_type == 'tag' }}
+  #       with:
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         charts_dir: .
 
   update-chart:
     runs-on: ubuntu-latest
     if: ${{ github.ref_type == 'tag' }}
-    needs:
-      - release-chart
+    # needs:
+    #   - release-chart
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,7 +55,14 @@ jobs:
         run: |
           tag="${{ github.ref_name }}"
           BASE_REF="${{ github.event.base_ref }}"
-          BRANCH="${BASE_REF#refs/heads/}"
+          if [ -n "$BASE_REF" ]; then
+            BRANCH="${BASE_REF#refs/heads/}"
+          else
+            echo "Branch missing..."
+            BRANCH="$(nix-shell --pure --run "./scripts/helm/find-released-branch.sh "$tag"" ./scripts/helm/shell.nix)"
+          fi
+          echo "BASE_BRANCH=$BRANCH" >> $GITHUB_ENV
+
           nix-shell --pure --run "./scripts/helm/publish-chart-yaml.sh --released "$tag" --released-branch "$BRANCH"" ./scripts/helm/shell.nix
           nix-shell --pure --run "SKIP_GIT=1 ./scripts/helm/generate-readme.sh" ./scripts/helm/shell.nix
       - name: Create Pull Request
@@ -73,7 +80,7 @@ jobs:
           signoff: true
           delete-branch: true
           branch-suffix: "random"
-          base: ${{ github.event.base_ref }}
+          base: ${{ env.BASE_BRANCH }}
           token: ${{ secrets.ORG_CI_GITHUB }}
       - name: Approve Pull Request by CI Bot
         if: ${{ steps.cpr.outputs.pull-request-number }}
@@ -93,3 +100,7 @@ jobs:
           gh pr comment ${{ steps.cpr.outputs.pull-request-number }} --body "bors merge"
         env:
           GH_TOKEN: ${{ secrets.ORG_CI_GITHUB }}
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        timeout-minutes: 120
+        uses: mxschmitt/action-tmate@v3
