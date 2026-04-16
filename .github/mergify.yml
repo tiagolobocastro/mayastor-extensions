@@ -1,7 +1,13 @@
 queue_rules:
   - name: default
+    update_method: rebase
+    branch_protection_injection_mode: merge
+    update_bot_account: openebs-ci
     merge_conditions:
       - check-success=bors-ci
+
+merge_queue:
+  max_parallel_checks: 1
 
 pull_request_rules:
   - name: auto-label and approve backport PRs
@@ -17,17 +23,3 @@ pull_request_rules:
         message: "Automatically approved backport PR"
         bot_account: openebs-ci
 
-  - name: merge via mergify queue
-    conditions:
-      - base~=^(develop|release/\d+\.\d+)$
-      - "#approved-reviews-by>=2"
-      - -label="DO NOT MERGE"
-      - -label=wip
-      - check-success=helm-chart-test
-      - check-success=helm-images
-      - check-success=submodule-branch
-      - check-success=commitlint
-      - check-success=DCO
-    actions:
-      queue:
-        name: default
