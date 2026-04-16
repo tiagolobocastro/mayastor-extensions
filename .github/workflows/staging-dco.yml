@@ -1,8 +1,6 @@
-name: Staging DCO
+name: DCO
 on:
-  push:
-    branches:
-      - staging
+  merge_group:
 
 jobs:
   DCO:

@@ -2,9 +2,7 @@ name: Lint Commit Messages
 on:
   pull_request:
     types: ['opened', 'edited', 'reopened', 'synchronize']
-  push:
-    branches:
-      - staging
+  merge_group:
 
 jobs:
   commitlint:
@@ -31,8 +29,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Only run for PR's and simply succeed the bors staging branch
-          if [ ! ${{ github.ref }} = "refs/heads/staging" ]; then
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
             first_commit=${{ github.event.pull_request.base.sha }}
             last_commit=${{ github.event.pull_request.head.sha }}
             # Ensure code-review commits don't get merged
@@ -47,4 +44,9 @@ jobs:
                 exit 1
               fi
             fi
+          elif [ "${{ github.event_name }}" = "merge_group" ]; then
+            first_commit=${{ github.event.merge_group.base_sha }}
+            last_commit=${{ github.event.merge_group.head_sha }}
+            sed "s/code-review-rule': \[0/code-review-rule': [2/g" -i commitlint.config.js
+            npx commitlint --from $first_commit --to $last_commit -V
           fi

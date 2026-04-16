@@ -2,11 +2,11 @@ name: Submodule Branch Check
 on:
   pull_request:
     types: ['opened', 'edited', 'reopened', 'synchronize']
+  merge_group:
   push:
     branches:
       - develop
       - 'release/**'
-      - staging
 
 jobs:
   submodule-branch:
@@ -29,9 +29,11 @@ jobs:
           token: ${{ secrets.ORG_CI_GITHUB }}
       - name: Check root submodules branch
         run: |
-          pr_branch="${{ github.event.pull_request.base.ref }}"
-          if [ -n "$pr_branch" ]; then
-            check_branch="$pr_branch"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            check_branch="${{ github.event.pull_request.base.ref }}"
+          elif [ "${{ github.event_name }}" = "merge_group" ]; then
+            base_ref="${{ github.event.merge_group.base_ref }}"
+            check_branch="${base_ref#refs/heads/}"
           else
             check_branch="${{ github.ref_name }}"
           fi
