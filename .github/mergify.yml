@@ -19,7 +19,7 @@ pull_request_rules:
 
   - name: merge via mergify queue
     conditions:
-      - base~=^(develop|release/.*)$
+      - base~=^(develop|release/\d+\.\d+)$
       - "#approved-reviews-by>=2"
       - -label="DO NOT MERGE"
       - -label=wip
