@@ -9,8 +9,10 @@ queue_rules:
     queue_conditions:
       - check-success = commitlint
       - check-success = submodule-branch
-      - check-skipped = ci
       - check-success = helm-ci / helm-images-pr
+      - check-success = helm-ci / helm-chart-test
+      - check-success = int-ci / int-tests
+      - check-success = lint-ci / linter
 merge_queue:
   max_parallel_checks: 1
 merge_protections_settings:
