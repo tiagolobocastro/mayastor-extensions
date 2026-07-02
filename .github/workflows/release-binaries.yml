@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'release/**'
-      - 'develop'
   workflow_call:
     inputs:
       tag:
