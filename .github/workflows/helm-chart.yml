@@ -25,14 +25,10 @@ jobs:
     if: ${{ inputs.trigger == 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
   helm-images:
     runs-on: ubuntu-latest
     if: ${{ inputs.trigger != 'pull_request' }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: recursive
       

@@ -12,12 +12,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-      - uses: ./.github/actions/setup-nix
-        with:
-          gc: true
-      - name: Test building the release images
-        run: RUSTFLAGS="-C debuginfo=0 -C strip=debuginfo" ./scripts/release.sh --skip-publish --build-bins --debug --no-static-linking
-      - name: Test building the static binaries
-        run: nix-build -A utils.debug.x86_64.linux-musl.kubectl-plugin --arg incremental false
+

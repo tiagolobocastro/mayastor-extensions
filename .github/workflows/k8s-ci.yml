@@ -22,7 +22,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive      # debugging
   #      - name: Setup tmate session
   #        if: ${{ failure() }}
   #        timeout-minutes: 120
