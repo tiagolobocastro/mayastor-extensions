@@ -11,6 +11,7 @@ queue_rules:
       - check-success = submodule-branch
       - check-success-or-neutral = lint-ci
       - check-success-or-neutral = helm-ci
+      - check-success = helm-ci / helm-images-pr (pull_request)
 merge_queue:
   max_parallel_checks: 1
 merge_protections_settings:
