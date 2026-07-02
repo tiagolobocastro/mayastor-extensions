@@ -10,6 +10,7 @@ queue_rules:
       - check-success = commitlint
       - check-success = submodule-branch
       - check-skipped = ci
+      - check-success = helm-ci / helm-images-pr
 merge_queue:
   max_parallel_checks: 1
 merge_protections_settings:
