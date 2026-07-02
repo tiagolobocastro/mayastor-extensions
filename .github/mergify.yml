@@ -9,9 +9,8 @@ queue_rules:
     queue_conditions:
       - check-success = commitlint
       - check-success = submodule-branch
-      - check-success-or-neutral = lint-ci
-      - check-success-or-neutral = helm-ci
-      - check-success = helm-ci / helm-images-pr (pull_request)
+      - check-success-or-skipped = lint-ci
+      - check-success-or-skipped = helm-ci
 merge_queue:
   max_parallel_checks: 1
 merge_protections_settings:
