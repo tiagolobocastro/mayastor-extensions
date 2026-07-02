@@ -2,7 +2,6 @@ queue_rules:
   - name: default
     update_method: rebase
     branch_protection_injection_mode: merge
-    draft_bot_account: tiagolobocastro
     merge_conditions:
       - check-success = ci
       - check-success = submodule-branch
